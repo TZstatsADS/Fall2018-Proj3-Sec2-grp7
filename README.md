@@ -5,13 +5,13 @@
 
 Term: Fall 2018
 
-+ Team #
++ Team #7
 + Team members
-	+ team member 1
-	+ team member 2
-	+ team member 3
-	+ team member 4
-	+ team member 5
+	+ Guo, Yaoqi  yg2542@columbia.edu
+	+ Loewenstein, Oded orl2108@columbia.edu
+	+ Ma, Yunsheng  ym2650@columbia.edu
+	+ Zhang, Yixin  yz3223@columbia.edu
+	+ Zheng, Wanyi  wz2409@columbia.edu
 
 + Project summary: In this project, we created a classification engine for enhance the resolution of images. 
 	
