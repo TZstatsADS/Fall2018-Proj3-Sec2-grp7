@@ -1,14 +1,11 @@
 ---
-title: "Project 3 - Example Main Script"
-author: "Chengliang Tang, Tian Zheng"
+title: "Project 3 - Baseline"
+author: "Yixin Zhang, Oded Loewenstein"
 output: html_notebook
 ---
 
-In your final repo, there should be an R markdown file that organizes **all computational steps** for evaluating your proposed image classification framework. 
-
-This file is currently a template for running evaluation experiments of image analysis (or any predictive modeling). You should update it according to your codes but following precisely the same structure. 
-
-```{r}
+This file is for baseline. The improved model and its code is demonstrated in another ipynb file.
+```{r, warning=FALSE, message=FALSE}
 if(!require("EBImage")){
   source("https://bioconductor.org/biocLite.R")
   biocLite("EBImage")
@@ -26,12 +23,9 @@ library("gbm")
 ### Step 0: specify directories.
 
 Set the working directory to the image folder. Specify the training and the testing set. For data without an independent test/validation set, you need to create your own testing data by random subsampling. In order to obain reproducible results, set.seed() whenever randomization is used. 
-
 ```{r wkdir, eval=FALSE}
 set.seed(2018)
-setwd("./ads_fall2018_proj3") 
-# here replace it with your own path or manually set it in RStudio to where this rmd file is located. 
-# use relative path for reproducibility
+setwd("../doc") 
 ```
 
 Provide directories for training images. Low-resolution (LR) image set and High-resolution (HR) image set will be in different subfolders. 
@@ -53,29 +47,20 @@ In this chunk, we have a set of controls for the evaluation experiments.
 + (T/F) process features for test set
 
 ```{r exp_setup}
-run.cv=TRUE # run cross-validation on the training set
-K <- 5  # number of CV folds
+run.cv=T # run cross-validation on the training set
+K <- 3  # number of CV folds
 run.feature.train=TRUE # process features for training set
 run.test=TRUE # run evaluation on an independent test set
 run.feature.test=TRUE # process features for test set
 ```
 
-Using cross-validation or independent test set evaluation, we compare the performance of models with different specifications. In this example, we use GBM with different `depth`. In the following chunk, we list, in a vector, setups (in this case, `depth`) corresponding to models that we will compare. In your project, you might compare very different classifiers. You can assign them numerical IDs and labels specific to your project. 
-
+Using cross-validation or independent test set evaluation, we compare the performance of models with different specifications. In this example, we use GBM with different `depth`. In the following chunk, we list, in a vector, setups (in this case, `depth`) corresponding to models that we will compare (depth = 1 and depth = 2). We also set shrinkage = 0.1 in our gbm fit.
 ```{r model_setup}
-model_values <- seq(3, 11, 2)
+model_values <- c(1,2)
 model_labels = paste("GBM with depth =", model_values)
 ```
 
-### Step 2: import training images class labels.
-
-We provide extra information of image label: car (0), flower (1), market (2). These labels are not necessary for your model.
-
-```{r train_label}
-extra_label <- read.csv(train_label_path, colClasses=c("NULL", NA, NA))
-```
-
-### Step 3: construct features and responses
+### Step 2: construct features and responses
 
 `feature.R` should be the wrapper for all your feature engineering functions and options. The function `feature( )` should have options that correspond to different scenarios for your project and produces an R object that contains features and responses that are required by all the models you are going to evaluate later. 
 + `feature.R`
@@ -91,13 +76,13 @@ if(run.feature.train){
   tm_feature_train <- system.time(dat_train <- feature(train_LR_dir, train_HR_dir))
   feat_train <- dat_train$feature
   label_train <- dat_train$label
-}
+  }
 
-#save(dat_train, file="./output/feature_train.RData")
+save(dat_train, file="../output/feature_train.RData")
 ```
 
 
-### Step 4: Train a classification model with training images
+### Step 3: Train a classification model with training images
 Call the train model and test model from library. 
 
 `train.R` and `test.R` should be wrappers for all your model training steps and your classification/prediction steps. 
@@ -114,7 +99,7 @@ source("../lib/test.R")
 ```
 
 #### Model selection with cross-validation
-* Do model selection by choosing among different values of training model parameters, that is, the interaction depth for GBM in this example. 
+* Do model selection by choosing among different values of training model parameters, that is, the interaction depth for GBM in our model. 
 ```{r runcv, message=FALSE, warning=FALSE}
 source("../lib/cross_validation.R")
 
@@ -126,6 +111,7 @@ if(run.cv){
   }
   save(err_cv, file="../output/err_cv.RData")
 }
+err_cv
 ```
 
 Visualize cross-validation results. 
@@ -133,7 +119,7 @@ Visualize cross-validation results.
 if(run.cv){
   load("../output/err_cv.RData")
   plot(model_values, err_cv[,1], xlab="Interaction Depth", ylab="CV Error",
-       main="Cross Validation Error", type="n", ylim=c(0, 0.25))
+       main="Cross Validation Error", type="n", ylim=c(0, 0.01))
   points(model_values, err_cv[,1], col="blue", pch=16)
   lines(model_values, err_cv[,1], col="blue")
   arrows(model_values, err_cv[,1]-err_cv[,2], model_values, err_cv[,1]+err_cv[,2], 
@@ -143,6 +129,7 @@ if(run.cv){
 
 
 * Choose the "best"" parameter value
+We chose depth = 2 based on the MSE.
 ```{r best_model}
 model_best=model_values[1]
 if(run.cv){
@@ -153,13 +140,13 @@ par_best <- list(depth=model_best)
 ```
 
 * Train the model with the entire training set using the selected model (model parameter) via cross-validation.
-```{r final_train}
+```{r final_train, warning=FALSE, message=FALSE}
 tm_train=NA
 tm_train <- system.time(fit_train <- train(feat_train, label_train, par_best))
 save(fit_train, file="../output/fit_train.RData")
 ```
 
-### Step 5: Super-resolution for test images
+### Step 4: Super-resolution for test images
 Feed the final training model with the completely holdout testing data. 
 + `superResolution.R`
   + Input: a path that points to the folder of low-resolution test images.
@@ -174,17 +161,28 @@ test_HR_dir <- paste(test_dir, "HR/", sep="")
 
 tm_test=NA
 if(run.test){
-  load(file="../output/fit_train.RData")
+  # load(file="../output/fit_train.RData")
   tm_test <- system.time(superResolution(test_LR_dir, test_HR_dir, fit_train))
 }
 ```
+
+### Step 5: PSNR for test HR images and origin HR images
+
+We write a img function to get a list of psnr of all the images.
+Then calculate the mean to get PSNR = 24.67765. 
+```{r}
+source("../lib/psnr.R")
+psnr <- mean(calculate_psnr(test_HR_dir,train_HR_dir))
+psnr
+```
+
 
 ### Summarize Running Time
 Prediction performance matters, so does the running times for constructing features and for training the model, especially when the computation resource is limited. 
 ```{r running_time}
 cat("Time for constructing training features=", tm_feature_train[1], "s \n")
-cat("Time for constructing testing features=", tm_feature_test[1], "s \n")
+# cat("Time for constructing testing features=", tm_feature_test[1], "s \n")
 cat("Time for training model=", tm_train[1], "s \n")
 cat("Time for super-resolution=", tm_test[1], "s \n")
 ```
-
+Time for super-resolution is based on a 1500-image test set.
