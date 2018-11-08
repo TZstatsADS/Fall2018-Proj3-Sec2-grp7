@@ -47,9 +47,9 @@ In this chunk, we have a set of controls for the evaluation experiments.
 + (T/F) process features for test set
 
 ```{r exp_setup}
-run.cv=T # run cross-validation on the training set
+run.cv=F # run cross-validation on the training set
 K <- 3  # number of CV folds
-run.feature.train=TRUE # process features for training set
+run.feature.train=T # process features for training set
 run.test=TRUE # run evaluation on an independent test set
 run.feature.test=TRUE # process features for test set
 ```
@@ -129,14 +129,15 @@ if(run.cv){
 
 
 * Choose the "best"" parameter value
-We chose depth = 2 based on the MSE.
+We chose depth = 2 based on the MSE. (To avoid rerun cross-validation part, we set depth=2 manually.)
 ```{r best_model}
 model_best=model_values[1]
 if(run.cv){
   model_best <- model_values[which.min(err_cv[,1])]
 }
 
-par_best <- list(depth=model_best)
+# par_best <- list(depth=model_best)
+par_best <- list(depth=2)
 ```
 
 * Train the model with the entire training set using the selected model (model parameter) via cross-validation.
