@@ -2,7 +2,7 @@
 ### Fit the regression model with testing data ###
 ######################################################
 
-### Author: Chengliang Tang
+### Group 7
 ### Project 3
 
 test <- function(modelList, dat_test){
@@ -29,6 +29,6 @@ test <- function(modelList, dat_test){
     predArr[, c1, c2] <- predict(fit_train$fit, newdata=featMat, 
                     n.trees=fit_train$iter, type="response")
   }
-  return(as.numeric(predArr))
+  return(predArr)
 }
 
