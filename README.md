@@ -13,7 +13,7 @@ Term: Fall 2018
 	+ Zhang, Yixin  yz3223@columbia.edu
 	+ Zheng, Wanyi  wz2409@columbia.edu
 
-+ Project summary: In this project, we created a classification engine for enhance the resolution of images. 
++ Project summary: In this project, we created a classification engine for enhance the resolution of images. Our baseline model is GBM. Using cross-validation, we compare the performance of models with different specifications and based on the MSE we chose depth = 2. Then we test it on 1500 images and get the psnr=24.67765. The improved model is SRCNN.
 	
 **Contribution statement**: ([default](doc/a_note_on_contributions.md)) All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
 
