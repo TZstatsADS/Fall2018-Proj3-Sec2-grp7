@@ -2,7 +2,7 @@
 ### Train a classification model with training features ###
 #########################################################
 
-### Author: Chengliang Tang
+### Group 7
 ### Project 3
 
 
@@ -38,6 +38,7 @@ train <- function(dat_train, label_train, par=NULL){
     labMat <- label_train[, c1, c2]
     fit_gbm <- gbm.fit(x=featMat, y=labMat,
                        n.trees=200,
+                       shrinkage = 0.1,
                        distribution="gaussian",
                        interaction.depth=depth, 
                        bag.fraction = 0.5,
