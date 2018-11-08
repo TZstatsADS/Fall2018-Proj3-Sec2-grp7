@@ -475,9 +475,9 @@ class SRCNN(object):
         image = merge(result, [nx, ny], self.c_dim)
      
         base, ext = os.path.basename(config.test_img).split('.')
-        
-        test_files =random.sample(files, len(files)//5) # a list of strings (the paths of each image)
-        LR_image = imread(os.path.join(os.path.join(os.getcwd(),'train_set',"LR"), base + '.jpg'))
+#         print('base =', base)
+#         test_files =random.sample(files, len(files)//5) # a list of strings (the paths of each image)
+        LR_image = imread(os.path.join(os.path.join(os.getcwd(),'test_set',"LR"), base + '.jpg'))
         LR_h = LR_image.shape[1]*2
         LR_w = LR_image.shape[0]*2  
         image = cv2.resize(image,(LR_h,LR_w))
@@ -561,10 +561,11 @@ with tf.Session() as sess:
     
     # Testing
     print(os.getcwd())
-    files = glob.glob(os.path.join(os.getcwd(), 'train_set', 'LR', '*.jpg'))
+#     files = glob.glob(os.path.join(os.getcwd(), 'test_set', 'LR', '*.jpg'))
 #     test_files = files[400:500] + files[900:1000] + files[1400:1500]
     # a list of strings (the paths of each image)
-    test_files = glob.glob(os.path.join(os.getcwd(), 'train_set', 'LR', '*.jpg'))
+    test_files = glob.glob(os.path.join(os.getcwd(), 'test_set', 'LR', '*.jpg'))
+
     FLAGS.is_train = False
     count = 1
     for f in test_files:
@@ -595,4 +596,10 @@ with tf.Session() as sess:
     for res_img in res_imgs:
         img = cv2.imread(res_img)
         cv2.imwrite(res_img[:-3] + 'jpg', img)
+
+
+# In[5]:
+
+
+# os.getcwd()
 
