@@ -1,0 +1,6 @@
+model_checkpoint_path: "SRCNN.model-2300"
+all_model_checkpoint_paths: "SRCNN.model-2260"
+all_model_checkpoint_paths: "SRCNN.model-2270"
+all_model_checkpoint_paths: "SRCNN.model-2280"
+all_model_checkpoint_paths: "SRCNN.model-2290"
+all_model_checkpoint_paths: "SRCNN.model-2300"
